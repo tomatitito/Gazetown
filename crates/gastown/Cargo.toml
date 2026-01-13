@@ -1,0 +1,17 @@
+[package]
+name = "gastown"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+description = "Gas Town - Multi-agent development workspace UI"
+
+[[bin]]
+name = "gastown"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+env_logger.workspace = true
+gpui = { workspace = true, features = ["wayland", "x11", "font-kit"] }
+theme.workspace = true
+ui.workspace = true
