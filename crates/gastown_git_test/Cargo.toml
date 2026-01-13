@@ -1,0 +1,20 @@
+[package]
+name = "gastown_git_test"
+version = "0.1.0"
+edition.workspace = true
+publish = false
+license = "GPL-3.0-or-later"
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "gastown_git_test"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+futures.workspace = true
+git.workspace = true
+gpui.workspace = true
+smol.workspace = true
