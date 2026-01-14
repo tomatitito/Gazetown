@@ -2,6 +2,39 @@
 
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
 
+## Development Commands
+
+### Formatting
+
+```bash
+cargo fmt --all              # Format all code
+cargo fmt --all -- --check   # Check formatting without modifying files
+```
+
+### Linting
+
+```bash
+./script/clippy              # Run clippy (use this instead of cargo clippy)
+```
+
+### Testing
+
+```bash
+cargo test                   # Run all tests
+cargo test -p <crate>        # Run tests for a specific crate
+```
+
+### CI Checks
+
+Before pushing, run these checks locally to catch CI failures:
+
+```bash
+cargo fmt --all -- --check   # Check formatting
+cargo machete                # Check for unused dependencies (requires cargo-machete)
+./script/check-licenses      # Verify license files exist in all crates
+cargo xtask workflows        # Regenerate GitHub workflow files after editing xtask
+```
+
 ## Quick Reference
 
 ```bash
