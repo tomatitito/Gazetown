@@ -1,7 +1,7 @@
 use anyhow::Result;
 use gpui::{
-    actions, div, px, size, App, AppContext, Bounds, ParentElement as _, Render, Styled as _,
-    ViewContext, Window, WindowBounds, WindowOptions,
+    App, AppContext, Bounds, ParentElement as _, Render, Styled as _, ViewContext, Window,
+    WindowBounds, WindowOptions, actions, div, px, size,
 };
 
 actions!(gastown, [Quit]);
@@ -13,7 +13,11 @@ pub fn on_quit(_quit: &Quit, cx: &mut AppContext) {
 struct GasTown;
 
 impl Render for GasTown {
-    fn render(&mut self, _window: &mut Window, _cx: &mut ViewContext<Self>) -> impl gpui::IntoElement {
+    fn render(
+        &mut self,
+        _window: &mut Window,
+        _cx: &mut ViewContext<Self>,
+    ) -> impl gpui::IntoElement {
         div()
             .flex()
             .items_center()

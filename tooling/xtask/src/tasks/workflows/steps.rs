@@ -156,8 +156,7 @@ pub struct NamedJob<J: JobType = RunJob> {
 //     }
 // }
 
-pub(crate) const DEFAULT_REPOSITORY_OWNER_GUARD: &str =
-    "(github.repository_owner == 'tomatitito')";
+pub(crate) const DEFAULT_REPOSITORY_OWNER_GUARD: &str = "(github.repository_owner == 'tomatitito')";
 
 pub fn repository_owner_guard_expression(trigger_always: bool) -> Expression {
     Expression::new(format!(
