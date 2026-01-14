@@ -63,7 +63,7 @@ jobs:
     needs:
     - check_style
     - run_tests_windows
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       CARGO_INCREMENTAL: 0
       ZED_CLIENT_CHECKSUM_SEED: ${{ secrets.ZED_CLIENT_CHECKSUM_SEED }}
@@ -113,7 +113,7 @@ jobs:
     needs:
     - check_style
     - run_tests_windows
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       CARGO_INCREMENTAL: 0
       ZED_CLIENT_CHECKSUM_SEED: ${{ secrets.ZED_CLIENT_CHECKSUM_SEED }}
@@ -362,7 +362,7 @@ jobs:
     - check_style
     - run_tests_windows
     if: (github.repository_owner == 'tomatitito')
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       ZED_CLIENT_CHECKSUM_SEED: ${{ secrets.ZED_CLIENT_CHECKSUM_SEED }}
       ZED_MINIDUMP_ENDPOINT: ${{ secrets.ZED_SENTRY_MINIDUMP_ENDPOINT }}
