@@ -1,23 +1,19 @@
 use anyhow::Result;
 use gpui::{
-    App, AppContext, Bounds, ParentElement as _, Render, Styled as _, ViewContext, Window,
-    WindowBounds, WindowOptions, actions, div, px, size,
+    App, Application, Bounds, Context, Window, WindowBounds, WindowOptions, actions, div,
+    prelude::*, px, size,
 };
 
 actions!(gastown, [Quit]);
 
-pub fn on_quit(_quit: &Quit, cx: &mut AppContext) {
+fn quit(_: &Quit, cx: &mut App) {
     cx.quit();
 }
 
 struct GasTown;
 
 impl Render for GasTown {
-    fn render(
-        &mut self,
-        _window: &mut Window,
-        _cx: &mut ViewContext<Self>,
-    ) -> impl gpui::IntoElement {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .flex()
             .items_center()
@@ -30,11 +26,10 @@ impl Render for GasTown {
 fn main() -> Result<()> {
     env_logger::init();
 
-    gpui::Application::new().run(|cx| {
+    Application::new().run(|cx: &mut App| {
         cx.activate(true);
-        cx.on_action(on_quit);
+        cx.on_action(quit);
 
-        // Open main window
         let size = size(px(1200.), px(800.));
         let bounds = Bounds::centered(None, size, cx);
 
@@ -47,7 +42,7 @@ fn main() -> Result<()> {
                 }),
                 ..Default::default()
             },
-            |_window, cx| cx.new_view(|_window, _cx| GasTown),
+            |_, cx| cx.new(|_| GasTown),
         )
         .expect("Failed to open window");
     });
