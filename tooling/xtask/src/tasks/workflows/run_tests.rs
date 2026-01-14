@@ -234,7 +234,7 @@ fn check_style() -> NamedJob {
         release_job(&[])
             .runs_on(runners::LINUX_MEDIUM)
             .add_step(steps::checkout_repo())
-            .add_step(steps::cache_rust_dependencies_namespace())
+            .add_step(steps::cache_rust_dependencies())
             .add_step(steps::setup_pnpm())
             .add_step(steps::prettier())
             .add_step(steps::cargo_fmt())
@@ -282,7 +282,7 @@ fn check_dependencies() -> NamedJob {
         release_job(&[])
             .runs_on(runners::LINUX_SMALL)
             .add_step(steps::checkout_repo())
-            .add_step(steps::cache_rust_dependencies_namespace())
+            .add_step(steps::cache_rust_dependencies())
             .add_step(install_cargo_machete())
             .add_step(run_cargo_machete())
             .add_step(check_cargo_lock())
@@ -296,7 +296,7 @@ fn check_workspace_binaries() -> NamedJob {
             .runs_on(runners::LINUX_LARGE)
             .add_step(steps::checkout_repo())
             .add_step(steps::setup_cargo_config(Platform::Linux))
-            .add_step(steps::cache_rust_dependencies_namespace())
+            .add_step(steps::cache_rust_dependencies())
             .map(steps::install_linux_dependencies)
             .add_step(steps::script("cargo build -p collab"))
             .add_step(steps::script("cargo build -p gastown"))
@@ -318,7 +318,7 @@ pub(crate) fn run_platform_tests(platform: Platform) -> NamedJob {
             .add_step(steps::checkout_repo())
             .add_step(steps::setup_cargo_config(platform))
             .when(platform == Platform::Linux, |this| {
-                this.add_step(steps::cache_rust_dependencies_namespace())
+                this.add_step(steps::cache_rust_dependencies())
             })
             .when(
                 platform == Platform::Linux,
@@ -391,7 +391,7 @@ fn doctests() -> NamedJob {
         release_job(&[])
             .runs_on(runners::LINUX_DEFAULT)
             .add_step(steps::checkout_repo())
-            .add_step(steps::cache_rust_dependencies_namespace())
+            .add_step(steps::cache_rust_dependencies())
             .map(steps::install_linux_dependencies)
             .add_step(steps::setup_cargo_config(Platform::Linux))
             .add_step(run_doctests())
@@ -404,7 +404,7 @@ fn check_licenses() -> NamedJob {
         Job::default()
             .runs_on(runners::LINUX_SMALL)
             .add_step(steps::checkout_repo())
-            .add_step(steps::cache_rust_dependencies_namespace())
+            .add_step(steps::cache_rust_dependencies())
             .add_step(steps::script("./script/check-licenses"))
             .add_step(steps::script("./script/generate-licenses")),
     )
@@ -444,7 +444,7 @@ fn check_docs() -> NamedJob {
             .add_step(steps::checkout_repo())
             .add_step(steps::setup_cargo_config(Platform::Linux))
             // todo(ci): un-inline build_docs/action.yml here
-            .add_step(steps::cache_rust_dependencies_namespace())
+            .add_step(steps::cache_rust_dependencies())
             .add_step(
                 lychee_link_check("./docs/src/**/*"), // check markdown links
             )

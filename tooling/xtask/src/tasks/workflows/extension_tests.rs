@@ -51,7 +51,7 @@ fn check_rust() -> NamedJob {
         .runs_on(runners::LINUX_MEDIUM)
         .timeout_minutes(3u32)
         .add_step(steps::checkout_repo())
-        .add_step(steps::cache_rust_dependencies_namespace())
+        .add_step(steps::cache_rust_dependencies())
         .add_step(steps::cargo_fmt())
         .add_step(run_clippy())
         .add_step(steps::cargo_install_nextest())
