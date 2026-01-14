@@ -112,8 +112,8 @@ pub fn clippy(platform: Platform) -> Step<Run> {
     }
 }
 
-pub fn cache_rust_dependencies_namespace() -> Step<Use> {
-    named::uses("namespacelabs", "nscloud-cache-action", "v1").add_with(("cache", "rust"))
+pub fn cache_rust_dependencies() -> Step<Use> {
+    named::uses("Swatinem", "rust-cache", "v2")
 }
 
 pub fn setup_linux() -> Step<Run> {
