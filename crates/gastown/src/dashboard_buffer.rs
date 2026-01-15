@@ -5,7 +5,21 @@ use gpui::{
     SharedString, Styled, Window, div,
 };
 use std::sync::Arc;
-use workspace::item::{Item, ItemEvent};
+
+/// Events emitted by the dashboard when state changes
+#[derive(Clone, Debug)]
+pub enum DashboardEvent {
+    /// Dashboard data was refreshed
+    DataRefreshed,
+    /// Connection status changed
+    ConnectionChanged(ConnectionStatus),
+    /// An agent was added
+    AgentAdded(String),
+    /// An agent was removed
+    AgentRemoved(String),
+    /// An agent's status changed
+    AgentStatusChanged { name: String, status: AgentStatus },
+}
 
 /// Dashboard data returned by any data source
 #[derive(Clone, Debug, Default)]
@@ -19,6 +33,14 @@ pub struct DashboardData {
 pub struct AgentInfo {
     pub name: String,
     pub status: AgentStatus,
+    pub token_usage: Option<TokenUsage>,
+    pub context_fill: Option<f32>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct TokenUsage {
+    pub input_tokens: u64,
+    pub output_tokens: u64,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -63,7 +85,7 @@ impl std::fmt::Display for DashboardError {
     }
 }
 
-/// Formats dashboard data for display in the buffer
+/// Formats dashboard data for display
 pub struct DashboardFormatter;
 
 impl DashboardFormatter {
@@ -83,7 +105,19 @@ impl DashboardFormatter {
                     AgentStatus::Idle => "○",
                     AgentStatus::Error(_) => "✗",
                 };
-                output.push_str(&format!("  {} {}\n", status_icon, agent.name));
+                let mut line = format!("  {} {}", status_icon, agent.name);
+
+                if let Some(fill) = agent.context_fill {
+                    line.push_str(&format!(" [ctx: {:.0}%]", fill * 100.0));
+                }
+                if let Some(tokens) = &agent.token_usage {
+                    line.push_str(&format!(
+                        " [tokens: {}↓ {}↑]",
+                        tokens.input_tokens, tokens.output_tokens
+                    ));
+                }
+                output.push_str(&line);
+                output.push('\n');
             }
         }
         output.push('\n');
@@ -139,8 +173,9 @@ impl DashboardFormatter {
     }
 }
 
-/// Buffer view for displaying dashboard data
-pub struct DashboardBufferView {
+/// View for displaying dashboard data.
+/// This is a pure GPUI view - not a workspace Item.
+pub struct DashboardView {
     focus_handle: FocusHandle,
     content: SharedString,
     data_source: Arc<dyn DashboardDataSource>,
@@ -155,7 +190,7 @@ pub enum ConnectionStatus {
     Unknown,
 }
 
-impl DashboardBufferView {
+impl DashboardView {
     pub fn new(data_source: Arc<dyn DashboardDataSource>, cx: &mut App) -> Self {
         let mut view = Self {
             focus_handle: cx.focus_handle(),
@@ -184,8 +219,10 @@ impl DashboardBufferView {
         self.last_update
     }
 
-    pub fn refresh(&mut self, _cx: &mut Context<Self>) {
+    pub fn refresh(&mut self, cx: &mut Context<Self>) {
         self.refresh_sync();
+        cx.emit(DashboardEvent::DataRefreshed);
+        cx.notify();
     }
 
     fn refresh_sync(&mut self) {
@@ -207,28 +244,20 @@ impl DashboardBufferView {
     }
 }
 
-impl Focusable for DashboardBufferView {
+impl Focusable for DashboardView {
     fn focus_handle(&self, _cx: &App) -> FocusHandle {
         self.focus_handle.clone()
     }
 }
 
-impl EventEmitter<ItemEvent> for DashboardBufferView {}
+impl EventEmitter<DashboardEvent> for DashboardView {}
 
-impl Render for DashboardBufferView {
+impl Render for DashboardView {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .flex()
             .flex_col()
             .size_full()
             .child(self.content.clone())
-    }
-}
-
-impl Item for DashboardBufferView {
-    type Event = ItemEvent;
-
-    fn tab_content_text(&self, _detail: usize, _cx: &App) -> SharedString {
-        "Dashboard".into()
     }
 }

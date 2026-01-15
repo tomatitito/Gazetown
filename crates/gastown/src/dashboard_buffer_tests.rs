@@ -1,10 +1,9 @@
 use gpui::{AppContext, TestAppContext};
 use std::sync::Arc;
-use workspace::item::Item;
 
 use crate::dashboard_buffer::{
-    AgentInfo, AgentStatus, ConnectionStatus, ConvoyInfo, DashboardBufferView, DashboardData,
-    DashboardDataSource, DashboardError, DashboardFormatter, RigInfo,
+    AgentInfo, AgentStatus, ConnectionStatus, ConvoyInfo, DashboardData, DashboardDataSource,
+    DashboardError, DashboardFormatter, DashboardView, RigInfo,
 };
 
 /// Mock data source for testing
@@ -50,10 +49,14 @@ fn sample_dashboard_data() -> DashboardData {
             AgentInfo {
                 name: "agent-1".into(),
                 status: AgentStatus::Active,
+                token_usage: None,
+                context_fill: None,
             },
             AgentInfo {
                 name: "agent-2".into(),
                 status: AgentStatus::Idle,
+                token_usage: None,
+                context_fill: None,
             },
         ],
         convoys: vec![ConvoyInfo {
@@ -68,12 +71,12 @@ fn sample_dashboard_data() -> DashboardData {
 }
 
 #[gpui::test]
-async fn test_dashboard_buffer_displays_content(cx: &mut TestAppContext) {
+async fn test_dashboard_displays_content(cx: &mut TestAppContext) {
     let data_source = Arc::new(MockDataSource::available_with(sample_dashboard_data()));
-    let buffer = cx.new(|cx| DashboardBufferView::new(data_source, cx));
+    let view = cx.new(|cx| DashboardView::new(data_source, cx));
 
-    buffer.update(cx, |buffer: &mut DashboardBufferView, _cx| {
-        let content = buffer.content();
+    view.update(cx, |view: &mut DashboardView, _cx| {
+        let content = view.content();
         assert!(content.contains("Gastown Dashboard"));
         assert!(content.contains("agent-1"));
         assert!(content.contains("agent-2"));
@@ -82,31 +85,28 @@ async fn test_dashboard_buffer_displays_content(cx: &mut TestAppContext) {
 }
 
 #[gpui::test]
-async fn test_dashboard_buffer_is_read_only(cx: &mut TestAppContext) {
+async fn test_dashboard_is_read_only(cx: &mut TestAppContext) {
     let data_source = Arc::new(MockDataSource::available_with(DashboardData::default()));
-    let buffer = cx.new(|cx| DashboardBufferView::new(data_source, cx));
+    let view = cx.new(|cx| DashboardView::new(data_source, cx));
 
-    buffer.update(cx, |buffer: &mut DashboardBufferView, _cx| {
-        assert!(
-            buffer.is_read_only(),
-            "Dashboard buffer should be read-only"
-        );
+    view.update(cx, |view: &mut DashboardView, _cx| {
+        assert!(view.is_read_only(), "Dashboard should be read-only");
     });
 }
 
 #[gpui::test]
-async fn test_dashboard_buffer_refresh_updates_timestamp(cx: &mut TestAppContext) {
+async fn test_dashboard_refresh_updates_timestamp(cx: &mut TestAppContext) {
     let data_source = Arc::new(MockDataSource::available_with(DashboardData::default()));
-    let buffer = cx.new(|cx| DashboardBufferView::new(data_source, cx));
+    let view = cx.new(|cx| DashboardView::new(data_source, cx));
 
-    buffer.update(cx, |buffer: &mut DashboardBufferView, cx| {
-        let first_update = buffer.last_update();
+    view.update(cx, |view: &mut DashboardView, cx| {
+        let first_update = view.last_update();
         assert!(first_update.is_some());
 
         std::thread::sleep(std::time::Duration::from_millis(10));
-        buffer.refresh(cx);
+        view.refresh(cx);
 
-        let second_update = buffer.last_update();
+        let second_update = view.last_update();
         assert!(second_update.is_some());
         assert!(second_update.unwrap() > first_update.unwrap());
     });
@@ -115,22 +115,22 @@ async fn test_dashboard_buffer_refresh_updates_timestamp(cx: &mut TestAppContext
 #[gpui::test]
 async fn test_dashboard_shows_error_when_unavailable(cx: &mut TestAppContext) {
     let data_source = Arc::new(MockDataSource::unavailable());
-    let buffer = cx.new(|cx| DashboardBufferView::new(data_source, cx));
+    let view = cx.new(|cx| DashboardView::new(data_source, cx));
 
-    buffer.update(cx, |buffer: &mut DashboardBufferView, _cx| {
-        assert_eq!(buffer.connection_status(), &ConnectionStatus::Disconnected);
-        assert!(buffer.content().contains("unavailable"));
-        assert!(buffer.content().contains("gt up"));
+    view.update(cx, |view: &mut DashboardView, _cx| {
+        assert_eq!(view.connection_status(), &ConnectionStatus::Disconnected);
+        assert!(view.content().contains("unavailable"));
+        assert!(view.content().contains("gt up"));
     });
 }
 
 #[gpui::test]
 async fn test_dashboard_shows_connected_status(cx: &mut TestAppContext) {
     let data_source = Arc::new(MockDataSource::available_with(DashboardData::default()));
-    let buffer = cx.new(|cx| DashboardBufferView::new(data_source, cx));
+    let view = cx.new(|cx| DashboardView::new(data_source, cx));
 
-    buffer.update(cx, |buffer: &mut DashboardBufferView, _cx| {
-        assert_eq!(buffer.connection_status(), &ConnectionStatus::Connected);
+    view.update(cx, |view: &mut DashboardView, _cx| {
+        assert_eq!(view.connection_status(), &ConnectionStatus::Connected);
     });
 }
 
@@ -152,14 +152,20 @@ async fn test_dashboard_formatter_shows_agent_status(_cx: &mut TestAppContext) {
             AgentInfo {
                 name: "active-agent".into(),
                 status: AgentStatus::Active,
+                token_usage: None,
+                context_fill: None,
             },
             AgentInfo {
                 name: "idle-agent".into(),
                 status: AgentStatus::Idle,
+                token_usage: None,
+                context_fill: None,
             },
             AgentInfo {
                 name: "error-agent".into(),
                 status: AgentStatus::Error("connection lost".into()),
+                token_usage: None,
+                context_fill: None,
             },
         ],
         ..Default::default()
@@ -219,17 +225,6 @@ async fn test_dashboard_formatter_shows_rigs(_cx: &mut TestAppContext) {
 }
 
 #[gpui::test]
-async fn test_dashboard_tab_shows_correct_title(cx: &mut TestAppContext) {
-    let data_source = Arc::new(MockDataSource::available_with(DashboardData::default()));
-    let buffer = cx.new(|cx| DashboardBufferView::new(data_source, cx));
-
-    cx.read(|cx| {
-        let title = buffer.read(cx).tab_content_text(0, cx);
-        assert_eq!(title.as_ref(), "Dashboard");
-    });
-}
-
-#[gpui::test]
 async fn test_data_source_trait_with_mock(_cx: &mut TestAppContext) {
     let mock = MockDataSource::available_with(sample_dashboard_data());
 
@@ -250,4 +245,28 @@ async fn test_data_source_unavailable_returns_error(_cx: &mut TestAppContext) {
     let result = mock.fetch();
     assert!(result.is_err());
     assert!(matches!(result.unwrap_err(), DashboardError::NotAvailable));
+}
+
+#[gpui::test]
+async fn test_dashboard_formatter_shows_token_usage(_cx: &mut TestAppContext) {
+    use crate::dashboard_buffer::TokenUsage;
+
+    let data = DashboardData {
+        agents: vec![AgentInfo {
+            name: "busy-agent".into(),
+            status: AgentStatus::Active,
+            token_usage: Some(TokenUsage {
+                input_tokens: 1500,
+                output_tokens: 500,
+            }),
+            context_fill: Some(0.75),
+        }],
+        ..Default::default()
+    };
+
+    let formatted = DashboardFormatter::format(&data);
+
+    assert!(formatted.contains("busy-agent"));
+    assert!(formatted.contains("[ctx: 75%]"));
+    assert!(formatted.contains("[tokens: 1500↓ 500↑]"));
 }
