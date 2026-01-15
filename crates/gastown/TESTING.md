@@ -49,6 +49,7 @@ This allows:
 | `test_dashboard_formatter_shows_agent_status` | Status icons (●/○/✗) | ✅ Passing |
 | `test_dashboard_formatter_shows_convoy_progress` | Progress bars and percentages | ✅ Passing |
 | `test_dashboard_formatter_shows_rigs` | Rig name → path mapping | ✅ Passing |
+| `test_dashboard_formatter_shows_token_usage` | Token usage display | ✅ Passing |
 
 ### Data Source Tests
 
@@ -56,6 +57,56 @@ This allows:
 |------|-------------|--------|
 | `test_data_source_trait_with_mock` | Mock returns data correctly | ✅ Passing |
 | `test_data_source_unavailable_returns_error` | Unavailable returns error | ✅ Passing |
+
+### GPUI Rendering Tests
+
+| Test | Description | Status |
+|------|-------------|--------|
+| `test_gpui_render_produces_element` | GPUI view renders non-empty content | ✅ Passing |
+| `test_gpui_view_is_focusable` | View implements Focusable trait | ✅ Passing |
+
+### Real-Time Updates / Reactivity Tests
+
+| Test | Description | Status |
+|------|-------------|--------|
+| `test_refresh_emits_data_refreshed_event` | Refresh emits DataRefreshed event | ✅ Passing |
+| `test_reactive_data_updates_content` | Content updates when data source changes | ✅ Passing |
+| `test_connection_status_transitions` | Connection status tracks availability | ✅ Passing |
+
+### Performance Tests
+
+| Test | Description | Status |
+|------|-------------|--------|
+| `test_gpui_format_performance_small_dataset` | 1000 formats < 1s (small data) | ✅ Passing |
+| `test_gpui_format_performance_large_dataset` | 100 formats < 500ms (100 agents, 50 convoys, 20 rigs) | ✅ Passing |
+| `test_gpui_refresh_performance` | 100 refreshes < 500ms | ✅ Passing |
+
+### Layout and Styling Tests
+
+| Test | Description | Status |
+|------|-------------|--------|
+| `test_dashboard_layout_sections_order` | Sections appear in correct order | ✅ Passing |
+| `test_dashboard_status_icons_styling` | Status icons use correct symbols | ✅ Passing |
+| `test_progress_bar_rendering` | Progress bars render correctly at 0%, 50%, 100% | ✅ Passing |
+| `test_context_fill_percentage_formatting` | Context fill shows as percentage | ✅ Passing |
+
+### Data Binding Tests
+
+| Test | Description | Status |
+|------|-------------|--------|
+| `test_data_binding_agents` | Agent data displays correctly | ✅ Passing |
+| `test_data_binding_convoys` | Convoy data displays correctly | ✅ Passing |
+| `test_data_binding_rigs` | Rig data displays correctly | ✅ Passing |
+| `test_data_binding_preserves_special_characters` | Unicode/emojis preserved | ✅ Passing |
+
+### Edge Cases and Error Handling Tests
+
+| Test | Description | Status |
+|------|-------------|--------|
+| `test_empty_sections_display_placeholder` | Empty sections show placeholders | ✅ Passing |
+| `test_error_display_fetch_failed` | Fetch errors display correctly | ✅ Passing |
+| `test_error_display_parse_error` | Parse errors display correctly | ✅ Passing |
+| `test_multiple_rapid_refreshes` | Handles rapid refresh cycles | ✅ Passing |
 
 ## Running Tests
 
