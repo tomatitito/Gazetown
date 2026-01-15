@@ -16,4 +16,3 @@ gpui = { workspace = true, features = ["wayland", "x11", "font-kit"] }
 
 [dev-dependencies]
 gpui = { workspace = true, features = ["test-support"] }
-workspace = { workspace = true, features = ["test-support"] }
