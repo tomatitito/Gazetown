@@ -78,7 +78,6 @@ members = [
     "crates/fuzzy",
     "crates/belvedere",
     "crates/gazetown",
-    "crates/gastown",
     "crates/git",
     "crates/git_hosting_providers",
     "crates/git_ui",
@@ -309,7 +308,6 @@ fs = { path = "crates/fs" }
 fsevent = { path = "crates/fsevent" }
 fuzzy = { path = "crates/fuzzy" }
 belvedere = { path = "crates/belvedere" }
-gastown = { path = "crates/gastown" }
 git = { path = "crates/git" }
 git_hosting_providers = { path = "crates/git_hosting_providers" }
 git_ui = { path = "crates/git_ui" }

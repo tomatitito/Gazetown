@@ -6753,19 +6753,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gastown"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "collections",
- "dirs 4.0.0",
- "env_logger 0.11.8",
- "gpui",
- "theme",
- "ui",
-]
-
-[[package]]
 name = "gazetown"
 version = "0.1.0"
 dependencies = [
