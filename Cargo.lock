@@ -2090,6 +2090,7 @@ dependencies = [
  "telemetry",
  "telemetry_events",
  "theme",
+ "title_bar",
  "tracing",
  "ui",
  "url",

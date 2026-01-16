@@ -1,7 +1,6 @@
 use collections::HashMap;
-use gpui::{
-    div, prelude::*, AnyView, Context, FocusHandle, Focusable, Render, Window,
-};
+use gpui::{AnyView, Context, Entity, FocusHandle, Focusable, Render, Window, div, prelude::*};
+use title_bar::platform_title_bar::PlatformTitleBar;
 use ui::ActiveTheme;
 
 /// Holds the tabbed items in the center pane
@@ -72,18 +71,24 @@ pub struct Town {
     /// Center pane holding tabbed items
     center_pane: CenterPane,
 
+    /// Platform title bar
+    platform_titlebar: Entity<PlatformTitleBar>,
+
     /// Focus handle for keyboard navigation
     pub focus_handle: FocusHandle,
 }
 
 impl Town {
     pub fn new(path: std::path::PathBuf, cx: &mut Context<Self>) -> Self {
+        let platform_titlebar = cx.new(|cx| PlatformTitleBar::new("town-titlebar", cx));
+
         Self {
             path,
             rigs: HashMap::default(),
             agents: HashMap::default(),
             convoys: HashMap::default(),
             center_pane: CenterPane::new(),
+            platform_titlebar,
             focus_handle: cx.focus_handle(),
         }
     }
@@ -124,12 +129,10 @@ impl Town {
             .bg(colors.editor_background)
             .when(!self.center_pane.is_empty(), |div| {
                 div.child(self.render_tabs(cx))
-                   .child(self.render_active_item_content(cx))
+                    .child(self.render_active_item_content(cx))
             })
             .when(self.center_pane.is_empty(), |div| {
-                div.items_center()
-                   .justify_center()
-                   .child("No items open")
+                div.items_center().justify_center().child("No items open")
             })
     }
 
@@ -145,26 +148,22 @@ impl Town {
             .bg(colors.tab_bar_background)
             .border_b_1()
             .border_color(colors.border)
-            .children(
-                self.center_pane.items.iter().enumerate().map(|(index, _)| {
-                    let is_active = index == active_index;
-                    div()
-                        .id(("tab", index))
-                        .flex()
-                        .items_center()
-                        .px_3()
-                        .h_full()
-                        .when(is_active, |div| {
-                            div.bg(colors.tab_active_background)
-                               .border_b_2()
-                               .border_color(colors.element_selected)
-                        })
-                        .when(!is_active, |div| {
-                            div.bg(colors.tab_inactive_background)
-                        })
-                        .child(format!("Item {}", index + 1))
-                })
-            )
+            .children(self.center_pane.items.iter().enumerate().map(|(index, _)| {
+                let is_active = index == active_index;
+                div()
+                    .id(("tab", index))
+                    .flex()
+                    .items_center()
+                    .px_3()
+                    .h_full()
+                    .when(is_active, |div| {
+                        div.bg(colors.tab_active_background)
+                            .border_b_2()
+                            .border_color(colors.element_selected)
+                    })
+                    .when(!is_active, |div| div.bg(colors.tab_inactive_background))
+                    .child(format!("Item {}", index + 1))
+            }))
     }
 
     fn render_active_item_content(&mut self, _cx: &mut Context<Self>) -> impl IntoElement {
@@ -189,37 +188,53 @@ impl gpui::EventEmitter<()> for Town {}
 
 impl Render for Town {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let height = PlatformTitleBar::height(_window);
+
         div()
             .flex()
-            .flex_row()
+            .flex_col()
             .size_full()
             .bg(cx.theme().colors().editor_background)
             .child(
-                // Left dock area (placeholder)
                 div()
-                    .id("left-dock")
-                    .flex()
-                    .flex_col()
-                    .w_64()
-                    .h_full()
-                    .bg(cx.theme().colors().panel_background)
-                    .border_r_1()
-                    .border_color(cx.theme().colors().border)
-                    .child("Left Dock")
+                    .id("titlebar-container")
+                    .h(height)
+                    .w_full()
+                    .child(self.platform_titlebar.clone()),
             )
-            .child(self.render_center_pane(cx))
             .child(
-                // Right dock area (placeholder)
                 div()
-                    .id("right-dock")
                     .flex()
-                    .flex_col()
-                    .w_64()
-                    .h_full()
-                    .bg(cx.theme().colors().panel_background)
-                    .border_l_1()
-                    .border_color(cx.theme().colors().border)
-                    .child("Right Dock")
+                    .flex_row()
+                    .flex_1()
+                    .w_full()
+                    .child(
+                        // Left dock area (placeholder)
+                        div()
+                            .id("left-dock")
+                            .flex()
+                            .flex_col()
+                            .w_64()
+                            .h_full()
+                            .bg(cx.theme().colors().panel_background)
+                            .border_r_1()
+                            .border_color(cx.theme().colors().border)
+                            .child("Left Dock"),
+                    )
+                    .child(self.render_center_pane(cx))
+                    .child(
+                        // Right dock area (placeholder)
+                        div()
+                            .id("right-dock")
+                            .flex()
+                            .flex_col()
+                            .w_64()
+                            .h_full()
+                            .bg(cx.theme().colors().panel_background)
+                            .border_l_1()
+                            .border_color(cx.theme().colors().border)
+                            .child("Right Dock"),
+                    ),
             )
     }
 }

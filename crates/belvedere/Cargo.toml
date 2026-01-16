@@ -40,6 +40,7 @@ gpui.workspace = true
 gpui_tokio.workspace = true
 ui.workspace = true
 theme.workspace = true
+title_bar.workspace = true
 
 # From gazetown - language support
 language.workspace = true

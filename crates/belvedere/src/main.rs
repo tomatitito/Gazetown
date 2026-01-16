@@ -38,6 +38,8 @@ fn main() -> Result<()> {
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
                 titlebar: Some(gpui::TitlebarOptions {
                     title: Some("Belvedere".into()),
+                    appears_transparent: true,
+                    traffic_light_position: Some(gpui::Point::new(px(9.0), px(9.0))),
                     ..Default::default()
                 }),
                 ..Default::default()
