@@ -77,7 +77,6 @@ members = [
     "crates/fsevent",
     "crates/fuzzy",
     "crates/belvedere",
-    "crates/gazetown",
     "crates/git",
     "crates/git_hosting_providers",
     "crates/git_ui",

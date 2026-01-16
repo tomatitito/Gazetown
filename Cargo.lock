@@ -6753,48 +6753,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gazetown"
-version = "0.1.0"
-dependencies = [
- "agent",
- "agent_settings",
- "agent_ui",
- "anyhow",
- "ashpd",
- "assets",
- "collections",
- "db",
- "dirs 4.0.0",
- "env_logger 0.11.8",
- "futures 0.3.31",
- "git",
- "git_ui",
- "gpui",
- "gpui_tokio",
- "language",
- "languages",
- "log",
- "parking_lot",
- "paths",
- "project",
- "proto",
- "release_channel",
- "serde",
- "serde_json",
- "settings",
- "telemetry",
- "telemetry_events",
- "theme",
- "tracing",
- "ui",
- "url",
- "util",
- "uuid",
- "windows 0.61.3",
- "ztracing",
-]
-
-[[package]]
 name = "gemm"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

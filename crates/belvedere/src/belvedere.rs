@@ -1,3 +1,7 @@
+mod agent_section;
+mod convoy_section;
+mod dashboard_buffer;
+mod rig_section;
 pub mod town;
 pub mod town_item;
 
