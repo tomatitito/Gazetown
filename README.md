@@ -28,13 +28,13 @@ git clone https://github.com/tomatitito/Gazetown.git
 cd Gazetown
 
 # Build the application
-cargo build -p gastown --release
+cargo build -p belvedere --release
 
 # Run
-cargo run -p gastown --release
+cargo run -p belvedere --release
 ```
 
-The binary will be at `target/release/gastown`.
+The binary will be at `target/release/belvedere`.
 
 ## Usage
 
@@ -42,10 +42,10 @@ The binary will be at `target/release/gastown`.
 
 ```bash
 # Run directly
-cargo run -p gastown
+cargo run -p belvedere
 
 # Or use the built binary
-./target/release/gastown
+./target/release/belvedere
 ```
 
 This opens the Gas Town window where you can view your Town structure and agent activity.
@@ -53,7 +53,7 @@ This opens the Gas Town window where you can view your Town structure and agent 
 ### Typical Workflow
 
 1. **Start Gas Town services** — Run your Gas Town backend (`gt` commands)
-2. **Launch the UI** — `cargo run -p gastown`
+2. **Launch the UI** — `cargo run -p belvedere`
 3. **Monitor agents** — View Polecats executing work
 4. **Track convoys** — Watch progress on bundled tasks
 
@@ -62,9 +62,10 @@ This opens the Gas Town window where you can view your Town structure and agent 
 ### Project Structure
 
 ```
-crates/gastown/
+crates/belvedere/
 ├── src/
 │   ├── main.rs              # Application entry point
+│   ├── town.rs              # Root workspace entity
 │   ├── dashboard_buffer.rs  # Dashboard rendering component
 │   └── *_tests.rs           # Test files
 ├── Cargo.toml
@@ -75,16 +76,16 @@ crates/gastown/
 
 ```bash
 # Check compilation (fast)
-cargo check -p gastown
+cargo check -p belvedere
 
 # Build debug
-cargo build -p gastown
+cargo build -p belvedere
 
 # Build release
-cargo build -p gastown --release
+cargo build -p belvedere --release
 
 # Run tests
-cargo nextest run -p gastown
+cargo nextest run -p belvedere
 ```
 
 ### Code Style
